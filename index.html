@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赤壁賦心靈隨航占卜卡 - 育成高中簡維君老師設計</title>
+    <style>
+        :root {
+            --bg-color: #1a2332; /* 深夜藍 */
+            --card-bg: #f4f1ea; /* 宣紙白 */
+            --gold: #c39b56; /* 雅緻金 */
+            --dark-text: #2c363f;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--card-bg);
+            font-family: "Noto Serif TC", "PMingLiU", serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            background-image: radial-gradient(circle at center, #2a3850 0%, #101622 100%);
+        }
+        h1 {
+            color: var(--gold);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 2rem;
+        }
+        /* 翻牌場景與透視設定 (卡片拉高以容納圖片) */
+        .scene {
+            width: 340px;
+            height: 580px;
+            perspective: 1000px;
+            margin-bottom: 30px;
+        }
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            border: 2px solid var(--gold);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        /* 牌背設計 */
+        .card-back {
+            background: linear-gradient(135deg, #1e293b, #3b82f6);
+            background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 4px);
+            justify-content: center;
+        }
+        .card-back::after {
+            content: '蘇';
+            font-size: 80px;
+            color: rgba(255,255,255,0.2);
+            border: 4px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 牌面設計 */
+        .card-front {
+            background-color: var(--card-bg);
+            color: var(--dark-text);
+            transform: rotateY(180deg);
+            background-image: radial-gradient(circle at center, #ffffff 0%, #f4f1ea 100%);
+            justify-content: flex-start;
+        }
+        .card-id {
+            color: var(--gold);
+            font-size: 1rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        /* 圖片區塊 */
+        .card-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--gold);
+            margin-bottom: 10px;
+            display: none; /* 初始隱藏，抽卡後顯示 */
+            background-color: #ddd; /* 圖片載入前的底色 */
+        }
+        .card-name {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin: 5px 0;
+            color: #1a2332;
+        }
+        .card-keyword {
+            background-color: var(--gold);
+            color: #fff;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+        .card-quote {
+            font-size: 1.05rem;
+            font-style: italic;
+            text-align: center;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            padding: 0 10px;
+            border-left: 3px solid var(--gold);
+            border-right: 3px solid var(--gold);
+        }
+        .card-advice {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            text-align: justify;
+            padding: 12px;
+            background-color: rgba(195, 155, 86, 0.1);
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            flex-grow: 1; /* 讓文字區塊自動填滿剩下空間 */
+        }
+        /* 按鈕設計 */
+        button {
+            background-color: var(--gold);
+            color: #1a2332;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(195, 155, 86, 0.4);
+            transition: all 0.3s ease;
+            font-family: "Noto Serif TC", serif;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(195, 155, 86, 0.6);
+            background-color: #d4b06b;
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        /* 教師專屬頁尾 */
+        footer {
+            color: rgba(244, 241, 234, 0.5);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>赤壁賦心靈隨航占卜卡</h1>
+
+    <div class="scene">
+        <div class="card" id="tarotCard">
+            <div class="card-face card-back"></div>
+            <div class="card-face card-front">
+                <div class="card-id" id="cardId"></div>
+                <img class="card-image" id="cardImage" src="" alt="東坡心靈圖像">
+                <div class="card-name" id="cardName">點擊按鈕</div>
+                <div class="card-keyword" id="cardKeyword">準備抽卡</div>
+                <div class="card-quote" id="cardQuote">「靜心冥想你的困惑...」</div>
+                <div class="card-advice" id="cardAdvice">深呼吸，當你準備好時，點擊下方的按鈕抽取屬於你的東坡智慧。<br><br>(提示：若圖片無法顯示，請確認圖檔已命名為 01.jpg~16.jpg 並與此網頁放在同一個資料夾中)</div>
+            </div>
+        </div>
+    </div>
+
+    <button onclick="drawCard()" id="drawBtn">抽取心靈指引</button>
+    
+    <footer>設計者 育成高中簡維君老師</footer>
+
+    <script>
+        // 加入 image 屬性，對應您的圖檔名稱 (01.jpg, 02.jpg...)
+        const cardsData = [
+            { id: "01", image: "01.jpg", name: "清風", keyword: "平靜、順應", quote: "清風徐來，水波不興。", advice: "狀態：雖然有波動，但大環境是平穩的。<br><br>建議：保持內心定力，順勢而為，不要強求改變現狀。" },
+            { id: "02", image: "02.jpg", name: "明月", keyword: "澄澈、享有", quote: "月出於東山之上，徘徊於斗牛之間。", advice: "狀態：眼前有美好的事物，但你可能因忙碌而忽略。<br><br>建議：停下腳步，欣賞當下的擁有，美好的事物無需費力爭取。" },
+            { id: "03", image: "03.jpg", name: "扁舟", keyword: "自在、放任", quote: "縱一葦之所如，凌萬頃之茫然。", advice: "狀態：感到迷茫，不知道方向在哪裡。<br><br>建議：接受這種「茫然」，信任自然的安排，讓自己隨波逐流一陣子。" },
+            { id: "04", image: "04.jpg", name: "白露", keyword: "開闊、連結", quote: "白露橫江，水光接天。", advice: "狀態：視野受限，糾結於小節。<br><br>建議：提升高度，看向更遠的地方，你會發現天地無垠，煩惱渺小。" },
+            { id: "05", image: "05.jpg", name: "仙鶴", keyword: "超越、解脫", quote: "浩浩乎如馮虛御風……羽化而登仙。", advice: "狀態：感到被束縛，渴望自由。<br><br>建議：精神上的解脫比身體的自由更重要。嘗試從更高的視角看這場糾紛。" },
+            { id: "06", image: "06.jpg", name: "洞簫", keyword: "哀傷、抒發", quote: "其聲嗚嗚然，如怨如慕，如泣如訴。", advice: "狀態：心中有壓抑的悲傷或遺憾。<br><br>建議：不要壓抑情緒，找一個合適的渠道（藝術、傾訴）將悲傷抒發出來。" },
+            { id: "07", image: "07.jpg", name: "潛蛟", keyword: "驚動、困頓", quote: "舞幽壑之潛蛟。", advice: "狀態：原本平靜的生活被外力驚動，陷入混亂。<br><br>建議：保持警覺，這是考驗你韌性的時刻，在混亂中尋找新的平衡。" },
+            { id: "08", image: "08.jpg", name: "嫠婦", keyword: "孤獨、無助", quote: "泣孤舟之嫠婦。", advice: "狀態：感到孤立無援，像是一艘孤舟。<br><br>建議：接納這種孤獨感，它是生命的一部分。試著尋找同樣孤獨的心靈互相慰藉。" },
+            { id: "09", image: "09.jpg", name: "戰場", keyword: "滄桑、變遷", quote: "西望夏口，東望武昌。山川相繆，鬱乎蒼蒼。", advice: "狀態：面對物是人非的變遷，感到無奈。<br><br>建議：接受世事無常，歷史在演進，我們能做的只有珍惜當下。" },
+            { id: "10", image: "10.jpg", name: "英雄", keyword: "權力、幻滅", quote: "舳艫千里……橫槊賦詩，固一世之雄也。", advice: "狀態：追求功名利祿，追求最強大。<br><br>建議：反思「強大」的意義。曹操再強也已成空，你現在追求的是否是泡影？" },
+            { id: "11", image: "11.jpg", name: "蜉蝣", keyword: "渺小、無常", quote: "寄蜉蝣於天地，渺滄海之一粟。", advice: "狀態：在宏大的世界或困難面前，感到自身毫無價值。<br><br>建議：認清自身的有限，並不可恥。在有限的生命裡，活出自己的精彩。" },
+            { id: "12", image: "12.jpg", name: "遺響", keyword: "遺憾、寄託", quote: "知不可乎驟得，託遺響於悲風。", advice: "狀態：理想難成，感到挫折。<br><br>建議：接受有些目標無法立刻達成。將這份遺憾轉化為創作或另一種形式的寄託。" },
+            { id: "13", image: "13.jpg", name: "逝水", keyword: "變化、坦然", quote: "逝者如斯，而未嘗往也。", advice: "狀態：害怕改變，執著於過去。<br><br>建議：變化是永恆的。坦然面對流逝的事物，因為事物本體從未消失。" },
+            { id: "14", image: "14.jpg", name: "盈月", keyword: "循環、接納", quote: "盈虛者如彼，而卒莫消長也。", advice: "狀態：感到生活起伏不定，情緒波動。<br><br>建議：接受人生的月圓月缺。低谷過後必有高潮，保持平常心。" },
+            { id: "15", image: "15.jpg", name: "無盡藏", keyword: "享有、知足", quote: "惟江上之清風，與山間之明月……是造物者之無盡藏也。", advice: "狀態：總覺得不夠，在追求更多。<br><br>建議：你已經擁有了最珍貴的東西（清風、明月、時間）。學會「享有」而非「擁有」。" },
+            { id: "16", image: "16.jpg", name: "重酌", keyword: "重生、忘懷", quote: "客喜而笑，洗盞更酌……不知東方之既白。", advice: "狀態：經歷風雨後，終於釋懷。<br><br>建議：慶祝這次心靈的蛻變。忘卻煩惱，重新開始，迎接新的一天。" }
+        ];
+
+        const cardElement = document.getElementById('tarotCard');
+        const btnElement = document.getElementById('drawBtn');
+        const imgElement = document.getElementById('cardImage');
+
+        let isDrawing = false;
+
+        function drawCard() {
+            if (isDrawing) return; 
+            isDrawing = true;
+            btnElement.innerText = "洗牌中...";
+            
+            cardElement.classList.remove('is-flipped');
+
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * cardsData.length);
+                const selectedCard = cardsData[randomIndex];
+
+                document.getElementById('cardId').innerText = `NO. ${selectedCard.id}`;
+                document.getElementById('cardName').innerText = selectedCard.name;
+                document.getElementById('cardKeyword').innerText = selectedCard.keyword;
+                document.getElementById('cardQuote').innerText = selectedCard.quote;
+                document.getElementById('cardAdvice').innerHTML = selectedCard.advice;
+                
+                // 載入圖片並顯示
+                imgElement.src = selectedCard.image;
+                imgElement.style.display = 'block';
+
+                cardElement.classList.add('is-flipped');
+                
+                btnElement.innerText = "再次抽取";
+                isDrawing = false;
+                
+            }, 800); 
+        }
+
+        cardElement.addEventListener('click', () => {
+            if (!cardElement.classList.contains('is-flipped') && document.getElementById('cardId').innerText !== "") {
+                cardElement.classList.add('is-flipped');
+            }
+        });
+    </script>
+</body>
+</html>
